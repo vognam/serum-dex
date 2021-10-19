@@ -571,6 +571,8 @@ fn consume_events_loop(
         );
 
         if event_q_len == 0 {
+            let sleep_time = time::Duration::from_millis(30000);
+            thread::sleep(sleep_time);
             continue;
         } else if std::time::Duration::from_secs(max_wait_for_events_delay)
             .gt(&last_cranked_at.elapsed())
