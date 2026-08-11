@@ -136,6 +136,9 @@ pub enum Command {
         max_q_length: Option<u64>,
         #[clap(long)]
         max_wait_for_events_delay: Option<u64>,
+
+        #[clap(long)]
+        idle_sleep_seconds: Option<u64>,
     },
     MatchOrders {
         #[clap(long, short)]
@@ -272,6 +275,7 @@ pub fn start(opts: Opts) -> Result<()> {
             ref log_directory,
             ref max_q_length,
             ref max_wait_for_events_delay,
+            ref idle_sleep_seconds,
         } => {
             init_logger(log_directory);
             consume_events_loop(
@@ -286,6 +290,7 @@ pub fn start(opts: Opts) -> Result<()> {
                 num_accounts.unwrap_or(32),
                 max_q_length.unwrap_or(1),
                 max_wait_for_events_delay.unwrap_or(60),
+                idle_sleep_seconds.unwrap_or(30),
             )?;
         }
         Command::MonitorQueue {
@@ -522,6 +527,7 @@ fn consume_events_loop(
     num_accounts: usize,
     max_q_length: u64,
     max_wait_for_events_delay: u64,
+    idle_sleep_seconds: u64,
 ) -> Result<()> {
     info!("Getting market keys ...");
     let client = opts.client();
@@ -571,7 +577,7 @@ fn consume_events_loop(
         );
 
         if event_q_len == 0 {
-            let sleep_time = time::Duration::from_millis(30000);
+            let sleep_time = time::Duration::from_secs(idle_sleep_seconds);
             thread::sleep(sleep_time);
             continue;
         } else if std::time::Duration::from_secs(max_wait_for_events_delay)

@@ -1,0 +1,4 @@
+# One Solana market public key per line.
+# Copy this file to markets.txt and replace the placeholders before running.
+<MARKET_PUBLIC_KEY_1>
+<MARKET_PUBLIC_KEY_2>
